@@ -25,10 +25,12 @@ unsigned long lastMsg = millis();        // a variable used to set the frequency
 #define BracketCount 4
 
 int BracketRange[BracketCount];
-bool ReservationStatus[BracketCount]; 
-// String CurrentReserveName;
-// String CurrentReservePeriod;
+bool ReservationStatus[BracketCount];
+String CurrentReserveName = "SHTTLE";
+String CurrentReservePeriod = "08:00 - 09:00";
 
+const char *pCurrentReserveName = "SHTTLE";
+const char *pCurrentReservePeriod = "08:00 - 09:00";
 
 void reconnect();                  // declaration of the function used to reconnect to the MQTT broker
 void displayLoop(float potin_per); // declaration of the display loop
@@ -37,9 +39,9 @@ void displayQRcode(void);          // declare functions to use later
 void displaySC1(String name, String period);
 
 // other wifi cred
-const char *ssid = "W";                      // WiFi ssid
-const char *password = "12121212";           // WiFi password
-const char *mqtt_server = "192.168.8.179"; // MQTT broker ip address
+const char *ssid = "W";            // WiFi ssid
+const char *password = "12121212"; // WiFi password
+// const char *mqtt_server = "192.168.8.179"; // MQTT broker ip address
 
 // const char *ssid = "Nutmeg-2.4GHz";       // WiFi ssid
 // const char *password = "Qw121212";        // WiFi password

@@ -18,23 +18,38 @@ void callback(char *topic, byte *payload, unsigned int length) // the call back 
   {
     BracketRange[i] = payload_JSON["BracketRange"][i];
     ReservationStatus[i] = payload_JSON["ReservationStatus"][i];
-    if (ReservationStatus[i])
-    {
-      Serial.println(BracketRange[i]);
-    }
 
     // Serial.println(BracketRange[i]);
     // Serial.println(ReservationStatus[i]);
   }
 
-  String CurrentReserveName = payload_JSON["CurrentReserveName"];
-  String CurrentReservePeriod = payload_JSON["CurrentReservePeriod"];
-  // Serial.println(CurrentReserveName);
+  // for (int i = 0; i < BracketCount; i++)
+  // {
+  //   if (ReservationStatus[i])
+  //   {
+  //     Serial.println();
+  //     Serial.print(BracketRange[i]);
+  //     Serial.println(" is reserved");
+  //   }
+  //   else
+  //   {
+  //     Serial.println();
+  //     Serial.println(BracketRange[i] + " is available");
+  //   }
+  // }
 
-  content = payload_JSON["content"]; // stores the content parameter from the JSON document to the address *content
+  pCurrentReserveName = payload_JSON["CurrentReserveName"];
+  pCurrentReservePeriod = payload_JSON["CurrentReservePeriod"];
+
+  CurrentReserveName = pCurrentReserveName;
+  CurrentReservePeriod = pCurrentReservePeriod;
+      // Serial.println(CurrentReserveName);
+
+      content = payload_JSON["content"]; // stores the content parameter from the JSON document to the address *content
   // Serial.println(content);           // prints the content to serial for debugging
   message = content; // store the content of the telegram message in the variable
   // displayName();
+  displaySC1(CurrentReserveName, CurrentReservePeriod);
 }
 
 void setup() // the setup function runs only once after startup
@@ -55,17 +70,20 @@ void setup() // the setup function runs only once after startup
   Serial.println(WiFi.localIP());   // prints the current IP address to serial for debugging
                                     //
 
+  IPAddress mqtt_server(192, 168, WiFi.localIP()[2], 179);
+
   client.setServer(mqtt_server, 1883); // set the IP address and port of the MQTT broker
   client.setCallback(callback);        // set the callback function
 
   SPI.begin(EPD_SCLK, EPD_MISO, EPD_MOSI); // start the SPI protocol
   display.init();                          // initiate the display
-  display.setRotation(0);                  // set the rotation to portrait
+  display.setRotation(3);                  // set the rotation to portrait
 
   displayQRcode(); // display the QR code on the display
   displayName();   // display the name on the display
 
   delay(500); // wait to make sure the display is displaying correctly
+  displaySC1("name", "08:00-10:00");
 }
 
 void loop() // the loop function runs continuously
@@ -112,7 +130,7 @@ void displayQRcode(void) // display the QR code on the screen
     {
       if (qrcode_getModule(&qrcode, x, y))
       {
-        display.fillRect(4 + (4 * x), 4 + (4 * y), 4, 4, GxEPD_BLACK);
+        display.fillRect((3 * x), 25 + (3 * y), 3, 3, GxEPD_BLACK);
       }
     }
   }
@@ -120,6 +138,26 @@ void displayQRcode(void) // display the QR code on the screen
 
 void displaySC1(String name, String period)
 {
+  displayQRcode();
+  display.setTextSize(1);
+
+  display.setCursor(12, 0);
+  display.print("scan here");
+  display.setCursor(8, 11);
+  display.print("to reserve:");
+  
+  display.setCursor(100, 30);
+  display.print("reserved by:");
+  display.setCursor(100, 75);
+  display.print("period:");
+
+  display.setTextSize(2);
+  display.setCursor(100, 45);
+  display.print(name);
+  display.setCursor(100, 90);
+  display.print(period);
+  display.update();
+
 }
 
 void displayName(void) // display the name and location of the locker on the screen
